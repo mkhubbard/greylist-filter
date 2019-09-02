@@ -1,0 +1,6 @@
+request=smtpd_access_policy
+client_address=192.168.0.1
+client_name=localhost
+sender=sender@somewhere.com
+recipient=recipient@somewhere-else.com
+

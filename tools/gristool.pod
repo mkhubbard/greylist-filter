@@ -1,0 +1,161 @@
+=head1 NAME
+
+B<gristool> - grist greylist database managment tool
+
+=head1 SYNOPSIS
+
+gristool.pl [B<OPTIONS>] [B<COMMAND>] B<arguments>...
+
+=head1 DESCRIPTION
+
+B<Gristool> is part of the grist greylist policy server toolset. B<Gristool> provides a simplified 
+interface to the greylist database and is required for common database maintaince procedures.
+
+This man page was written very late one night, or early one morning depedning how you want to look
+at it. A rewrite and restructure is pending but the beef of the information is acurate, and if I 
+goofed the utility will let you know. =)
+
+=head1 OPTIONS
+
+=over 6
+
+=item B<-c>, B<--conf>
+
+Specify the full path and name of the grist configuration file. 
+
+Default is: /usr/local/etc/grist.conf
+
+=item B<-p>, B<--pretend>
+
+Will prevent any modifications from beign made to the database. Only applies to operations which would 
+alter the database other commands will simply ignore it.
+
+=item B<-v>, B<--verbose>
+
+Will cause B<gristool> to print various messages to the screen throughout the course of execution. This
+option is usually only useful for troubleshooting.
+
+=item B<-V>, B<--version>
+
+Display version information and exit.
+
+=back
+
+=head1 COMMANDS
+
+B<Gristool> has serveral modes of operation which are accessable through command subsets. Below is a list
+of commands that are currently implemented and a detailed look at thier usage.
+
+=head2 prune AGE <dead-requests>
+
+=over 6
+
+The B<prune> command is used to remove request records from the greylist database. 
+
+All requests older than or equal to B<AGE> will be removed from the database. B<AGE> may be specified as 
+seconds, minutes, hours, or days by appending 's', 'm', 'h' or 'd' as a value hint. 
+
+Examples of valid B<AGE> values:
+
+=over 6
+
+	45d	translates to 45 days or <xxx> seconds
+	3h	translates to 3 hours or <xxx> seconds
+	45m	translates to 45 minutes or <xxx> seconds
+	100s	translates to 100 seconds
+
+=back
+
+An B<AGE> value without a trailing 's', 'm', 'h' or 'd' is considered invalid.
+
+If B<dead-requests> is specified only records which have a seen count of zero are removed from the
+database. 
+
+=back
+
+=head2 check FIELD VALUE
+
+=over 6
+
+The B<check> command allows you to query the greylist database on one field for an exact value match
+and display the results to the console. 
+
+It is planned to extend the functionality of this command to allow for similar matching and querying
+on multiple fields. In addition other commands for more complex analysis queries are on the drawing
+board. 
+
+Valid B<FIELD> values are:
+
+	from|sender	
+	to|recipient
+	ip|sourceip
+	host|hostname
+
+Examples:
+
+=over 6
+	
+To seach for all requests sent from joe@mydomain.com:
+
+=over 6
+
+B<gristool check from joe@mydomain.com>
+
+=back
+
+To search for all requests for maria@herdomain.com:
+
+=over 6
+
+B<gristool check to maria@herdomain.com>
+
+=back
+
+=back
+
+The output of this command is very self explainatory i will discuss it later.. maybe.
+
+=head1 GREYLIST DATABASE MAINTAINCE
+
+When implementing a greylisting solution for a high traffic mail server the greylist database will grow very quickly. 
+Even for low traffic mail servers the database will require regular pruning though hourly might be excessive.
+It is recommended that you schedule B<gristool> to run at regular intervals using a schedualing daemon such as
+B<cron> to remove any requests which are considered 'dead'.
+
+An example B<cron> entry to run B<gristool> every hour and remove all dead request records older than 5 
+hours would be as follows:
+
+=over 6
+
+0 * * * * /usr/local/bin/gristool prune 5h dead-requests
+
+=back
+
+It is also recommended that you schedule a monthly run to remove all records over a specific age. 
+
+An example B<cron> entry to run B<gristool> once a month and remove all request records older than 30 days would 
+be as follows:
+
+=over 6
+
+* * 1 * * /usr/local/bin/gristool prune 30d
+
+=back
+
+=head1 AUTHORS
+
+TODO
+
+=head1 REPORTING BUGS
+
+TODO
+
+=head1 COPYRIGHT
+
+TODO
+
+=head1 SEE ALSO
+
+TODO
+
+
